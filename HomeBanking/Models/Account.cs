@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection.Metadata;
 
 namespace HomeBanking.Models
@@ -11,5 +13,6 @@ namespace HomeBanking.Models
         public double Balance { get; set; }
         public Client Client { get; set; }
         public long ClientId { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
     }
 }
