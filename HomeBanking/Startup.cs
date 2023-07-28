@@ -38,6 +38,8 @@ namespace HomeBanking
 
             //Agregamos el scoped de ClientRepository
             services.AddScoped<IClientRepository, ClientRepository>();
+            //Agregamos el scoped de AccountRepository
+            services.AddScoped<IAccountRepository, AccountRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
