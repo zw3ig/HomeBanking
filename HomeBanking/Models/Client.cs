@@ -11,6 +11,7 @@ namespace HomeBanking.Models
         public string Password { get; set; }
         public ICollection<Account> Accounts { get; set; }
         public ICollection<ClientLoan> ClientLoans { get; set; }
+        public ICollection<Card> Cards { get; set; }
         
     }
 }
