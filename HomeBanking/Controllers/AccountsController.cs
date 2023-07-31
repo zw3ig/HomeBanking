@@ -60,11 +60,14 @@ namespace HomeBanking.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(long id)
         {
             try
             {
                 var account = _accountRepository.FindById(id);
+
+                if (account == null)
+                    return Forbid();
 
                 var accountDTO = new AccountDTO()
                 {
