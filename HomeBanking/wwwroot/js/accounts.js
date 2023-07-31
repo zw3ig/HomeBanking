@@ -2,7 +2,8 @@ var app = new Vue({
     el:"#app",
     data:{
         clientInfo: {},
-        error: null
+        error: null,
+        port: location.port
     },
     methods:{
         getData: function(){
