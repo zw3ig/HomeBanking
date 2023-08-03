@@ -44,6 +44,8 @@ namespace HomeBanking
             services.AddScoped<IAccountRepository, AccountRepository>();
             //Agregamos el scoped de CardRepository
             services.AddScoped<ICardRepository, CardRepository>();
+            //Agregamos el scoped de TransactionRepository
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
 
             //Autenticacion
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

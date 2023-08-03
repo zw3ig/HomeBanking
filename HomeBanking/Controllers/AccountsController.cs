@@ -110,6 +110,8 @@ namespace HomeBanking.Controllers
                     return Forbid();
                 }
 
+
+
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
@@ -117,6 +119,7 @@ namespace HomeBanking.Controllers
                     return Forbid();
                 }
 
+                //IEnumerable<Account> accounts = _accountRepository.GetAccountsByClient(client.Id);
                 var accountsDTO = new List<AccountDTO>();
 
                 foreach (Account account in client.Accounts)

@@ -10,5 +10,6 @@ namespace HomeBanking.Repositories
         Account FindById(long id);
         IEnumerable<Account> GetAccountsByClient(long clientId);
         string GetLastAccountNumber();
+        Account FindByNumber(string number);
     }
 }
