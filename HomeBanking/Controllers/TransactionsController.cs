@@ -32,7 +32,7 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid("Email vacío");
+                    return Forbid("Email vacio");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
