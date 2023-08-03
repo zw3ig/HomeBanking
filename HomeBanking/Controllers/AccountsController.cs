@@ -171,11 +171,22 @@ namespace HomeBanking.Controllers
                     return Forbid();
                 }
 
-                var random = new Random();
+                //En una aplicacion real que esta en produccion esta manera de asignar el Account Number está mal porque se podrían repetir los
+                //numeros en algun momento. La manera correcta podría ser hacerlo incremental a partir de la ultima cuenta creada en la base.
+                //Para mostrar el funcionamiento sirve.
+                //var random = new Random();
+                //Number = "VIN-" + random.Next(0, 99999999).ToString().PadLeft(8, '0'),
+
+
+                //Nueva manera
+                string lastAccountNumber = _accountRepository.GetLastAccountNumber();
+                int newNumber = Convert.ToInt32(lastAccountNumber.Substring(4))+1;
+                if (newNumber > 99999999)
+                    return Forbid();
 
                 Account newAccount = new Account
                 {
-                    Number = "VIN-"+random.Next(0, 99999999),
+                    Number = "VIN-"+newNumber.ToString().PadLeft(8, '0'),
                     CreationDate = DateTime.Now,
                     Balance = 0,
                     ClientId = client.Id

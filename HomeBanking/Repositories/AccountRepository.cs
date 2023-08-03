@@ -34,5 +34,15 @@ namespace HomeBanking.Repositories
                 .Include(account => account.Transactions)
                 .ToList();
         }
+
+        public string GetLastAccountNumber()
+        {
+            return FindAll()
+                .OrderByDescending(account => account.CreationDate)
+                .Select(account => account.Number)
+                .FirstOrDefault()
+                .ToString();
+            
+        }
     }
 }
