@@ -38,6 +38,7 @@ namespace HomeBanking.Repositories
         {
             return FindByCondition(client => client.Email.ToUpper() == email.ToUpper())
             .Include(client => client.Accounts)
+                .ThenInclude(client => client.Transactions)
             .Include(client => client.ClientLoans)
                 .ThenInclude(cl => cl.Loan)
             .Include(client => client.Cards)
