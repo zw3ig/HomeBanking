@@ -4,6 +4,8 @@ using HomeBanking.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HomeBanking.Controllers
 {
@@ -26,12 +28,44 @@ namespace HomeBanking.Controllers
             _transactionRepository = transactionRepository;
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            try
+            {
+                var loans = _loanRepository.GetAll();
+            
+                List<LoanDTO> loanDTOs = new List<LoanDTO>();
+
+                foreach (var loan in loans)
+                {
+                    LoanDTO loanDTO = new LoanDTO()
+                    {
+                        Id = loan.Id,
+                        Name = loan.Name,
+                        MaxAmount = loan.MaxAmount,
+                        Payments = loan.Payments,
+                    };
+
+                    loanDTOs.Add(loanDTO);
+                }
+
+                return Ok(loanDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [HttpPost]
         public IActionResult Post([FromBody] LoanApplicationDTO loanApplicationDTO)
         {
             try
             {
+                if (loanApplicationDTO.Amount < 1 || String.IsNullOrEmpty(loanApplicationDTO.ToAccountNumber) || String.IsNullOrEmpty(loanApplicationDTO.Payments))
+                    return StatusCode(403, "Datos invalidos");
+
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                     return Forbid();
@@ -41,7 +75,11 @@ namespace HomeBanking.Controllers
                     return Forbid();
 
                 var loan = _loanRepository.FindById(loanApplicationDTO.LoanId);
-                if(loan == null || loanApplicationDTO.Amount >= loan.MaxAmount || (loanApplicationDTO.Payments == null || loanApplicationDTO.Payments == string.Empty))
+
+                if (loan == null ||
+                    loanApplicationDTO.Amount >= loan.MaxAmount ||
+                    (loanApplicationDTO.Payments == null || loanApplicationDTO.Payments == string.Empty) ||
+                    !loan.Payments.Split(',').Contains(loanApplicationDTO.Payments))
                     return Forbid();
 
                 var account = _accountRepository.FindByNumber(loanApplicationDTO.ToAccountNumber);
@@ -69,8 +107,8 @@ namespace HomeBanking.Controllers
                     AccountId = account.Id,
                     Amount = loanApplicationDTO.Amount,
                     Date = DateTime.Now,
-                    Description = "Prestamo "+loan.Name,
-                    Type = TransactionType.DEBIT.ToString(),
+                    Description = loan.Name+" loan approved",
+                    Type = TransactionType.CREDIT.ToString(),
                 };
             
                 _transactionRepository.Save(transaction);
