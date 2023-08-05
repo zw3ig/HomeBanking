@@ -78,6 +78,13 @@ namespace HomeBanking
                 app.UseExceptionHandler("/Error");
             }
 
+            //Agregando estas 3 lineas seteo el index.html como default cuando corro la app
+            DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
+            defaultFilesOptions.DefaultFileNames.Clear();
+            defaultFilesOptions.DefaultFileNames.Add("index.html");
+
+            app.UseDefaultFiles();
+
             app.UseStaticFiles();
 
             app.UseRouting();

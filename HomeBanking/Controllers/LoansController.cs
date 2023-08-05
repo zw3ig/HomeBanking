@@ -80,7 +80,7 @@ namespace HomeBanking.Controllers
                     loanApplicationDTO.Amount >= loan.MaxAmount ||
                     (loanApplicationDTO.Payments == null || loanApplicationDTO.Payments == string.Empty) ||
                     !loan.Payments.Split(',').Contains(loanApplicationDTO.Payments))
-                    return Forbid();
+                    return StatusCode(403, "Datos invalidos");
 
                 var account = _accountRepository.FindByNumber(loanApplicationDTO.ToAccountNumber);
                 if (account == null || account.ClientId != client.Id) 
