@@ -40,8 +40,8 @@ var app = new Vue({
                     color: this.cardColor,
                 })
                     .then(() => { window.location.href = "/cards.html" })
-                    .catch(() => {
-                        this.errorMsg = "Sign up failed, check the information"
+                    .catch((response) => {
+                        this.errorMsg = response.response.data
                         this.errorToats.show();
                     })
             }
