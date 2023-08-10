@@ -70,7 +70,7 @@ namespace HomeBanking.Controllers
                 var account = _accountRepository.FindById(id);
 
                 if (account == null)
-                    return Forbid();
+                    return StatusCode(403, "Account not found");
 
                 var accountDTO = new AccountDTO()
                 {
@@ -107,7 +107,7 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
 
@@ -116,7 +116,7 @@ namespace HomeBanking.Controllers
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 //IEnumerable<Account> accounts = _accountRepository.GetAccountsByClient(client.Id);

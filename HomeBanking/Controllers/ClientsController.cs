@@ -68,7 +68,7 @@ namespace HomeBanking.Controllers
                 var client = _clientRepository.FindById(id);
 
                 if(client == null)
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
 
                 var clientDTO = new ClientDTO
                 {
