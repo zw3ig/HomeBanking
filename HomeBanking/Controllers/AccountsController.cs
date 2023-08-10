@@ -156,19 +156,19 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 if (client.Accounts.Count() == 3)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Account limit per client reached");
                 }
 
                 //En una aplicacion real que esta en produccion esta manera de asignar el Account Number está mal porque se podrían repetir los
@@ -186,7 +186,7 @@ namespace HomeBanking.Controllers
                     newNumber = Convert.ToInt32(lastAccountNumber.Substring(4)) + 1;
 
                 if (newNumber > 99999999)
-                    return Forbid();
+                    return StatusCode(403, "Error, contact developers");
 
                 Account newAccount = new Account
                 {

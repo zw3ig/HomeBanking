@@ -120,14 +120,14 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 var clientDTO = new ClientDTO
@@ -179,14 +179,14 @@ namespace HomeBanking.Controllers
             {
                 //validamos datos antes
                 if (String.IsNullOrEmpty(client.Email) || String.IsNullOrEmpty(client.Password) || String.IsNullOrEmpty(client.FirstName) || String.IsNullOrEmpty(client.LastName))
-                    return StatusCode(403, "Datos inválidos");
+                    return StatusCode(403, "Invalid Data");
 
                 //buscamos si ya existe el usuario
                 Client user = _clientRepository.FindByEmail(client.Email);
 
                 if (user != null)
                 {
-                    return StatusCode(403, "El email ingresado está en uso");
+                    return StatusCode(403, "Email is already in use");
                 }
 
                 Client newClient = new Client
@@ -207,7 +207,7 @@ namespace HomeBanking.Controllers
                     newNumber = Convert.ToInt32(lastAccountNumber.Substring(4)) + 1;
 
                 if (newNumber > 99999999)
-                    return Forbid();
+                    return StatusCode(403, "Error, contact developers");
 
                 Account newAccount = new Account
                 {
