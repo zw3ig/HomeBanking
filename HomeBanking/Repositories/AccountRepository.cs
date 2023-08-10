@@ -40,8 +40,8 @@ namespace HomeBanking.Repositories
             return FindAll()
                 .OrderByDescending(account => account.CreationDate)
                 .Select(account => account.Number)
-                .FirstOrDefault()
-                .ToString();
+                .FirstOrDefault() ?? "";
+
             
         }
     }

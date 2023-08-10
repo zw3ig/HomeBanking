@@ -180,7 +180,11 @@ namespace HomeBanking.Controllers
 
                 //Nueva manera
                 string lastAccountNumber = _accountRepository.GetLastAccountNumber();
-                int newNumber = Convert.ToInt32(lastAccountNumber.Substring(4))+1;
+
+                int newNumber = 1;
+                if (lastAccountNumber != string.Empty)
+                    newNumber = Convert.ToInt32(lastAccountNumber.Substring(4)) + 1;
+
                 if (newNumber > 99999999)
                     return Forbid();
 
@@ -193,7 +197,15 @@ namespace HomeBanking.Controllers
                 };
 
                 _accountRepository.Save(newAccount);
-                return Ok(newAccount);
+
+                var accountDTO = new AccountDTO
+                {
+                    Number = newAccount.Number,
+                    CreationDate = newAccount.CreationDate,
+                    Balance = newAccount.Balance
+                };
+
+                return Created("", accountDTO);
 
             }
             catch (Exception ex)
