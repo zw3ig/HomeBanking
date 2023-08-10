@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualBasic;
 using System;
+using System.Text.Json.Serialization;
 
 namespace HomeBanking.DTOS
 {
     public class CardDTO
     {
+        [JsonIgnore]
         public long Id { get; set; }
         public string CardHolder { get; set; }
         public string Type { get; set; }
