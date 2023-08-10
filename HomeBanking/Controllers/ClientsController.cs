@@ -14,10 +14,12 @@ namespace HomeBanking.Controllers
     public class ClientsController : ControllerBase
     {
         private IClientRepository _clientRepository;
+        private IAccountRepository _accountRepository;
 
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository)
         {
             _clientRepository = clientRepository;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet]
@@ -66,7 +68,7 @@ namespace HomeBanking.Controllers
                 var client = _clientRepository.FindById(id);
 
                 if(client == null)
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
 
                 var clientDTO = new ClientDTO
                 {
@@ -118,14 +120,14 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 var clientDTO = new ClientDTO
@@ -177,14 +179,14 @@ namespace HomeBanking.Controllers
             {
                 //validamos datos antes
                 if (String.IsNullOrEmpty(client.Email) || String.IsNullOrEmpty(client.Password) || String.IsNullOrEmpty(client.FirstName) || String.IsNullOrEmpty(client.LastName))
-                    return StatusCode(403, "Datos inválidos");
+                    return StatusCode(403, "Invalid Data");
 
                 //buscamos si ya existe el usuario
                 Client user = _clientRepository.FindByEmail(client.Email);
 
                 if (user != null)
                 {
-                    return StatusCode(403, "El email ingresado está en uso");
+                    return StatusCode(403, "Email is already in use");
                 }
 
                 Client newClient = new Client
@@ -195,8 +197,45 @@ namespace HomeBanking.Controllers
                     LastName = client.LastName,
                 };
 
+                //el save le asigna el ID a newClient.
                 _clientRepository.Save(newClient);
-                return Created("", newClient);
+
+                string lastAccountNumber = _accountRepository.GetLastAccountNumber();
+
+                int newNumber = 1;
+                if (lastAccountNumber != string.Empty)
+                    newNumber = Convert.ToInt32(lastAccountNumber.Substring(4)) + 1;
+
+                if (newNumber > 99999999)
+                    return StatusCode(403, "Error, contact developers");
+
+                Account newAccount = new Account
+                {
+                    Number = "VIN-" + newNumber.ToString().PadLeft(8, '0'),
+                    CreationDate = DateTime.Now,
+                    Balance = 0,
+                    ClientId = newClient.Id
+                };
+
+                _accountRepository.Save(newAccount);
+
+                //pasar dto en vez del obj normal
+                var clientDTO = new ClientDTO
+                {
+                    Id = newClient.Id,
+                    Email = newClient.Email,
+                    FirstName = newClient.FirstName,
+                    LastName = newClient.LastName,
+                    Accounts = newClient.Accounts.Select(ac => new AccountDTO
+                    {
+                        Id = ac.Id,
+                        Balance = ac.Balance,
+                        CreationDate = ac.CreationDate,
+                        Number = ac.Number
+                    }).ToList()
+                };
+
+                return Created("", clientDTO);
 
             }
             catch (Exception ex)

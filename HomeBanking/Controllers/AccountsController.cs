@@ -70,7 +70,7 @@ namespace HomeBanking.Controllers
                 var account = _accountRepository.FindById(id);
 
                 if (account == null)
-                    return Forbid();
+                    return StatusCode(403, "Account not found");
 
                 var accountDTO = new AccountDTO()
                 {
@@ -107,7 +107,7 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
 
@@ -116,7 +116,7 @@ namespace HomeBanking.Controllers
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 //IEnumerable<Account> accounts = _accountRepository.GetAccountsByClient(client.Id);
@@ -159,19 +159,19 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 if (client.Accounts.Count() == 3)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Account limit per client reached");
                 }
 
                 //En una aplicacion real que esta en produccion esta manera de asignar el Account Number está mal porque se podrían repetir los
@@ -183,9 +183,13 @@ namespace HomeBanking.Controllers
 
                 //Nueva manera
                 string lastAccountNumber = _accountRepository.GetLastAccountNumber();
-                int newNumber = Convert.ToInt32(lastAccountNumber.Substring(4))+1;
+
+                int newNumber = 1;
+                if (lastAccountNumber != string.Empty)
+                    newNumber = Convert.ToInt32(lastAccountNumber.Substring(4)) + 1;
+
                 if (newNumber > 99999999)
-                    return Forbid();
+                    return StatusCode(403, "Error, contact developers");
 
                 Account newAccount = new Account
                 {
@@ -196,7 +200,15 @@ namespace HomeBanking.Controllers
                 };
 
                 _accountRepository.Save(newAccount);
-                return Ok(newAccount);
+
+                var accountDTO = new AccountDTO
+                {
+                    Number = newAccount.Number,
+                    CreationDate = newAccount.CreationDate,
+                    Balance = newAccount.Balance
+                };
+
+                return Created("", accountDTO);
 
             }
             catch (Exception ex)

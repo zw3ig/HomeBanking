@@ -1,4 +1,6 @@
-﻿namespace HomeBanking.DTOS
+﻿using System.Text.Json.Serialization;
+
+namespace HomeBanking.DTOS
 {
     public class ClientLoanDTO
     {

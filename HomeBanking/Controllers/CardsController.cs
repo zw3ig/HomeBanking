@@ -29,14 +29,15 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
+
                 }
 
                 var cardsDTO = new List<CardDTO>();
@@ -74,19 +75,19 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Unauthorized client");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
 
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Client not found");
                 }
 
                 if (client.Cards.Count() == 3)
                 {
-                    return Forbid();
+                    return StatusCode(403, "Card limit per client reached");
                 }
 
                 Card newCard = new Card()
@@ -102,7 +103,19 @@ namespace HomeBanking.Controllers
                 };
 
                 _cardRepository.Save(newCard);
-                return Created("", newCard);
+
+                CardDTO cardDTO = new CardDTO()
+                {
+                    CardHolder = newCard.CardHolder,
+                    Type = newCard.Type,
+                    Color = newCard.Color,
+                    Number = newCard.Number,
+                    Cvv = newCard.Cvv,
+                    FromDate = newCard.FromDate,
+                    ThruDate = newCard.ThruDate
+                };
+
+                return Created("", cardDTO);
 
             }
             catch (Exception ex)
