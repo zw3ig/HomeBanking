@@ -43,7 +43,7 @@ namespace HomeBanking.Models
                 {
                     var accounts = new Account[]
                     {
-                        new Account {ClientId = accountVictor.Id, CreationDate = DateTime.Now, Number = "VIN001", Balance = 111 }
+                        new Account {ClientId = accountVictor.Id, CreationDate = DateTime.Now, Number = "VIN-00000001", Balance = 111 }
                     };
                     foreach (Account account in accounts)
                     {
@@ -60,7 +60,7 @@ namespace HomeBanking.Models
 
             {
 
-                var account1 = context.Accounts.FirstOrDefault(c => c.Number == "VIN001");
+                var account1 = context.Accounts.FirstOrDefault(c => c.Number == "VIN-00000001");
 
                 if (account1 != null)
 
