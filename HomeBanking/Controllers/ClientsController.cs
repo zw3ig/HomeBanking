@@ -172,6 +172,26 @@ namespace HomeBanking.Controllers
             }
         }
 
+        public bool ValidatePassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            bool containsUpperCase = password.Any(char.IsUpper);
+            bool containsLowerCase = password.Any(char.IsLower);
+            bool containsDigit = password.Any(char.IsDigit);
+
+            return containsUpperCase && containsLowerCase && containsDigit && password.Length >= 8;
+        }
+
+        public bool ValidateName(string name)
+        {
+            if (name.Any(char.IsDigit) || name.Length < 3)
+                return false;
+
+            return true;
+        }
+
         [HttpPost]
         public IActionResult Post([FromBody] Client client)
         {
@@ -188,6 +208,13 @@ namespace HomeBanking.Controllers
                 {
                     return StatusCode(403, "Email is already in use");
                 }
+
+                if (!ValidateName(client.FirstName) || !ValidateName(client.LastName))
+                    return StatusCode(403, "First Name and Last Name must have at least 3 characters of length and cannot contain digits");
+
+                if (!ValidatePassword(client.Password))
+                    return StatusCode(403, "Password needs at least 1 upper case, 1 lower case and at least 8 characters");
+
 
                 Client newClient = new Client
                 {
